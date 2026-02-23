@@ -31,9 +31,6 @@ jobs:
 
     - uses: ilammy/setup-nasm@v1
 
-    - name: Setup Perl environment
-      uses: shogo82148/actions-setup-perl@v1.37.1
-
     - name: Download OpenSSL source
       run: |
         curl -L -o openssl.tar.gz ${{ env.OPENSSL_URL }}
@@ -44,16 +41,20 @@ jobs:
 
     - name: Configure OpenSSL (Windows x64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
+        export CC=clang-cl
         perl Configure VC-WIN64A no-shared no-legacy --release /MT --prefix=${{ github.workspace }}/install/windows/x64
 
     - name: Build OpenSSL (Windows x64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         nmake
 
     - name: Install OpenSSL (Windows x64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         nmake install_sw
 
@@ -84,9 +85,6 @@ jobs:
 
     - uses: ilammy/setup-nasm@v1
 
-    - name: Setup Perl environment
-      uses: shogo82148/actions-setup-perl@v1.37.1
-
     - name: Download OpenSSL source
       run: |
         curl -L -o openssl.tar.gz ${{ env.OPENSSL_URL }}
@@ -97,16 +95,20 @@ jobs:
 
     - name: Configure OpenSSL (Windows ARM64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
+        export CC=clang-cl
         perl Configure VC-WIN64-ARM no-shared no-legacy --release /MT --prefix=${{ github.workspace }}/install/windows/arm64
 
     - name: Build OpenSSL (Windows ARM64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         nmake
 
     - name: Install OpenSSL (Windows ARM64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         nmake install_sw
 
@@ -130,9 +132,6 @@ jobs:
       with:
         version: "21.1.8"
         env: true
-
-    - name: Setup Perl environment
-      uses: shogo82148/actions-setup-perl@v1.37.1
 
     - name: Setup cross-compilation environment
       run: |
@@ -239,14 +238,6 @@ jobs:
       with:
         ndk-version: r29
         add-to-path: true
-
-    - name: Setup Perl environment
-      uses: shogo82148/actions-setup-perl@v1.37.1
-
-    - name: Install build dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y perl make
 
     - name: Download OpenSSL source
       run: |

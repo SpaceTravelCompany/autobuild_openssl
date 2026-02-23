@@ -1,0 +1,399 @@
+name: Build Libraries
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  OPENSSL_VERSION: "3.6.1"
+  OPENSSL_URL: "https://github.com/openssl/openssl/releases/download/openssl-3.6.1/openssl-3.6.1.tar.gz"
+
+jobs:
+  build-libraries-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Clang/LLVM
+      uses: KyleMayes/install-llvm-action@v2
+      with:
+        version: "21.1.8"
+        env: true
+
+    - uses: ilammy/msvc-dev-cmd@v1
+
+    - uses: ilammy/setup-nasm@v1
+
+    - name: Download OpenSSL source
+      run: |
+        curl -L -o openssl.tar.gz ${{ env.OPENSSL_URL }}
+
+    - name: Extract OpenSSL source
+      run: |
+        tar -xzf openssl.tar.gz
+
+    - name: Configure OpenSSL (Windows x64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        perl Configure VC-WIN64A no-shared no-legacy --release /MT --prefix=${{ github.workspace }}/install/windows/x64
+
+    - name: Build OpenSSL (Windows x64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        nmake
+
+    - name: Install OpenSSL (Windows x64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        nmake install_sw
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: libraries-windows
+        path: |
+          install/**
+        retention-days: 7
+
+  build-libraries-windows-arm64:
+    runs-on: windows-11-arm
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Clang/LLVM
+      uses: KyleMayes/install-llvm-action@v2
+      with:
+        version: "21.1.8"
+        env: true
+
+    - uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: amd64_arm64
+
+    - uses: ilammy/setup-nasm@v1
+
+    - name: Download OpenSSL source
+      run: |
+        curl -L -o openssl.tar.gz ${{ env.OPENSSL_URL }}
+
+    - name: Extract OpenSSL source
+      run: |
+        tar -xzf openssl.tar.gz
+
+    - name: Configure OpenSSL (Windows ARM64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        perl Configure VC-WIN64-ARM no-shared no-legacy --release /MT --prefix=${{ github.workspace }}/install/windows/arm64
+
+    - name: Build OpenSSL (Windows ARM64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        nmake
+
+    - name: Install OpenSSL (Windows ARM64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        nmake install_sw
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: libraries-windows-arm64
+        path: |
+          install/**
+        retention-days: 7
+
+  build-libraries-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Clang/LLVM
+      uses: KyleMayes/install-llvm-action@v2
+      with:
+        version: "21.1.8"
+        env: true
+
+    - name: Setup cross-compilation environment
+      run: |
+        sudo dpkg --add-architecture arm64
+        sudo dpkg --add-architecture riscv64
+        sudo dpkg --add-architecture i386
+        sudo dpkg --add-architecture armhf
+        sudo apt-get update || true
+        sudo apt-get install -y \
+          gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
+          gcc-riscv64-linux-gnu g++-riscv64-linux-gnu \
+          gcc-i686-linux-gnu g++-i686-linux-gnu \
+          gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf \
+          perl make
+
+    - name: Download OpenSSL source
+      run: |
+        curl -L -o openssl.tar.gz ${{ env.OPENSSL_URL }}
+
+    - name: Extract OpenSSL source
+      run: |
+        tar -xzf openssl.tar.gz
+
+    # --- x86_64 ---
+    - name: Configure OpenSSL (Linux x86_64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        ./Configure linux-x86_64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/x86_64
+
+    - name: Build & Install OpenSSL (Linux x86_64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        make -j$(nproc)
+        make install_sw
+        make distclean
+
+    # --- aarch64 ---
+    - name: Configure OpenSSL (Linux aarch64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        ./Configure linux-aarch64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/aarch64 --cross-compile-prefix=aarch64-linux-gnu-
+
+    - name: Build & Install OpenSSL (Linux aarch64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        make -j$(nproc)
+        make install_sw
+        make distclean
+
+    # --- riscv64 ---
+    - name: Configure OpenSSL (Linux riscv64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        ./Configure linux64-riscv64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/riscv64 --cross-compile-prefix=riscv64-linux-gnu-
+
+    - name: Build & Install OpenSSL (Linux riscv64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        make -j$(nproc)
+        make install_sw
+        make distclean
+
+    # --- i686 ---
+    - name: Configure OpenSSL (Linux i686)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        ./Configure linux-x86 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/i686 --cross-compile-prefix=i686-linux-gnu-
+
+    - name: Build & Install OpenSSL (Linux i686)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        make -j$(nproc)
+        make install_sw
+        make distclean
+
+    # --- armhf ---
+    - name: Configure OpenSSL (Linux armhf)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        ./Configure linux-armv4 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/armhf --cross-compile-prefix=arm-linux-gnueabihf-
+
+    - name: Build & Install OpenSSL (Linux armhf)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      run: |
+        make -j$(nproc)
+        make install_sw
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: libraries-compiled-linux
+        path: |
+          install/**
+        retention-days: 7
+
+  build-libraries-android:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - uses: nttld/setup-ndk@v1
+      id: setup-ndk
+      with:
+        ndk-version: r29
+        add-to-path: true
+
+    - name: Install build dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y perl make
+
+    - name: Download OpenSSL source
+      run: |
+        curl -L -o openssl.tar.gz ${{ env.OPENSSL_URL }}
+
+    - name: Extract OpenSSL source
+      run: |
+        tar -xzf openssl.tar.gz
+
+    # --- arm64-v8a ---
+    - name: Configure OpenSSL (Android arm64-v8a)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      env:
+        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      run: |
+        ./Configure android-arm64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/arm64-v8a -D__ANDROID_API__=35
+
+    - name: Build & Install OpenSSL (Android arm64-v8a)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      env:
+        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      run: |
+        make -j$(nproc)
+        make install_sw
+        make distclean
+
+    # --- armeabi-v7a ---
+    - name: Configure OpenSSL (Android armeabi-v7a)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      env:
+        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      run: |
+        ./Configure android-arm no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/armeabi-v7a -D__ANDROID_API__=35
+
+    - name: Build & Install OpenSSL (Android armeabi-v7a)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      env:
+        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      run: |
+        make -j$(nproc)
+        make install_sw
+        make distclean
+
+    # --- x86_64 ---
+    - name: Configure OpenSSL (Android x86_64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      env:
+        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      run: |
+        ./Configure android-x86_64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/x86_64 -D__ANDROID_API__=35
+
+    - name: Build & Install OpenSSL (Android x86_64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      env:
+        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      run: |
+        make -j$(nproc)
+        make install_sw
+        make distclean
+
+    # --- x86 ---
+    - name: Configure OpenSSL (Android x86)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      env:
+        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      run: |
+        ./Configure android-x86 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/x86 -D__ANDROID_API__=35
+
+    - name: Build & Install OpenSSL (Android x86)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      env:
+        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      run: |
+        make -j$(nproc)
+        make install_sw
+
+    # --- riscv64 ---
+    - name: Configure OpenSSL (Android riscv64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      env:
+        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      run: |
+        ./Configure android-riscv64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/riscv64 -D__ANDROID_API__=35
+
+    - name: Build & Install OpenSSL (Android riscv64)
+      working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      env:
+        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      run: |
+        make -j$(nproc)
+        make install_sw
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: libraries-compiled-android
+        path: |
+          install/**
+        retention-days: 7
+
+  create-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build-libraries-linux, build-libraries-android, build-libraries-windows, build-libraries-windows-arm64]
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Get version
+      uses: actions/github-script@v7
+      id: get-version
+      with:
+        script: |
+          const version = context.ref.replace('refs/tags/v', '');
+          core.setOutput('version', version);
+
+    - name: Prepare release directory
+      run: |
+        mkdir -p release
+        cp -r artifacts/libraries-compiled-linux release/linux
+        cp -r artifacts/libraries-compiled-android release/android
+        cp -r artifacts/libraries-windows release/windows
+        cp -r artifacts/libraries-windows-arm64 release/windows-arm64
+
+    - name: Create tar archive
+      working-directory: release
+      run: |
+        tar -czf ../libraries-${{ steps.get-version.outputs.version }}.tar.gz .
+
+    - name: Create zip archive
+      working-directory: release
+      run: |
+        zip -r ../libraries-${{ steps.get-version.outputs.version }}.zip .
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2.5.0
+      with:
+        files: |
+          libraries-*.tar.gz
+          libraries-*.zip
+        generate_release_notes: true
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -97,7 +97,7 @@ jobs:
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
       shell: cmd
       run: |
-        export CC=clang-cl
+        set CC=clang-cl
         perl Configure VC-WIN64-ARM no-shared no-legacy --release /MT --prefix=${{ github.workspace }}/install/windows/arm64
 
     - name: Build OpenSSL (Windows ARM64)
@@ -174,7 +174,7 @@ jobs:
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
       shell: bash
       run: |
-        ./Configure linux-aarch64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/aarch64 --cross-compile-prefix=aarch64-linux-gnu-
+        ./Configure linux-aarch64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/aarch64
 
     - name: Build & Install OpenSSL (Linux aarch64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
@@ -189,7 +189,7 @@ jobs:
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
       shell: bash
       run: |
-        ./Configure linux64-riscv64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/riscv64 --cross-compile-prefix=riscv64-linux-gnu-
+        ./Configure linux64-riscv64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/riscv64
 
     - name: Build & Install OpenSSL (Linux riscv64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
@@ -204,7 +204,7 @@ jobs:
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
       shell: bash
       run: |
-        ./Configure linux-x86 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/i686 --cross-compile-prefix=i686-linux-gnu-
+        ./Configure linux-x86 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/i686
 
     - name: Build & Install OpenSSL (Linux i686)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
@@ -219,7 +219,7 @@ jobs:
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
       shell: bash
       run: |
-        ./Configure linux-armv4 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/armhf --cross-compile-prefix=arm-linux-gnueabihf-
+        ./Configure linux-armv4 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/armhf
 
     - name: Build & Install OpenSSL (Linux armhf)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
@@ -249,6 +249,7 @@ jobs:
         add-to-path: false
 
     - name: Add NDK to PATH
+      shell: bash
       run: echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
 
     - name: Download OpenSSL source

@@ -248,10 +248,6 @@ jobs:
         ndk-version: r29
         add-to-path: false
 
-    - name: Add NDK to PATH
-      shell: bash
-      run: echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
-
     - name: Download OpenSSL source
       run: |
         curl -L -o openssl.tar.gz ${{ env.OPENSSL_URL }}
@@ -263,14 +259,18 @@ jobs:
     # --- arm64-v8a ---
     - name: Configure OpenSSL (Android arm64-v8a)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      shell: bash
       run: |
-        export CC=aarch64-linux-android35-clang
-        ./Configure android-arm64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/arm64-v8a -D__ANDROID_API__=35
+        NDK_BIN=${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin
+        ./Configure linux-generic64 no-shared no-legacy --release \
+          --prefix=${{ github.workspace }}/install/android/arm64-v8a \
+          CC=$NDK_BIN/aarch64-linux-android35-clang \
+          CXX=$NDK_BIN/aarch64-linux-android35-clang++ \
+          AR=$NDK_BIN/llvm-ar \
+          RANLIB=$NDK_BIN/llvm-ranlib \
+          STRIP=$NDK_BIN/llvm-strip
 
     - name: Build & Install OpenSSL (Android arm64-v8a)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
@@ -279,15 +279,18 @@ jobs:
     # --- armeabi-v7a ---
     - name: Configure OpenSSL (Android armeabi-v7a)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      shell: bash
       run: |
-        export CC=armv7a-linux-android35-clang
-        ./Configure android-arm no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/armeabi-v7a -D__ANDROID_API__=35
+        NDK_BIN=${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin
+        ./Configure linux-generic32 no-shared no-legacy --release \
+          --prefix=${{ github.workspace }}/install/android/armeabi-v7a \
+          CC=$NDK_BIN/armv7a-linux-androideabi35-clang \
+          CXX=$NDK_BIN/armv7a-linux-androideabi35-clang++ \
+          AR=$NDK_BIN/llvm-ar \
+          RANLIB=$NDK_BIN/llvm-ranlib \
+          STRIP=$NDK_BIN/llvm-strip
 
     - name: Build & Install OpenSSL (Android armeabi-v7a)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      
-      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
@@ -296,15 +299,18 @@ jobs:
     # --- x86_64 ---
     - name: Configure OpenSSL (Android x86_64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      shell: bash
       run: |
-        export CC=x86_64-linux-android35-clang
-        ./Configure android-x86_64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/x86_64 -D__ANDROID_API__=35
+        NDK_BIN=${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin
+        ./Configure linux-generic64 no-shared no-legacy --release \
+          --prefix=${{ github.workspace }}/install/android/x86_64 \
+          CC=$NDK_BIN/x86_64-linux-android35-clang \
+          CXX=$NDK_BIN/x86_64-linux-android35-clang++ \
+          AR=$NDK_BIN/llvm-ar \
+          RANLIB=$NDK_BIN/llvm-ranlib \
+          STRIP=$NDK_BIN/llvm-strip
 
     - name: Build & Install OpenSSL (Android x86_64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      
-      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
@@ -313,31 +319,38 @@ jobs:
     # --- x86 ---
     - name: Configure OpenSSL (Android x86)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      shell: bash
       run: |
-        export CC=i686-linux-android35-clang
-        ./Configure android-x86 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/x86 -D__ANDROID_API__=35
+        NDK_BIN=${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin
+        ./Configure linux-generic32 no-shared no-legacy --release \
+          --prefix=${{ github.workspace }}/install/android/x86 \
+          CC=$NDK_BIN/i686-linux-android35-clang \
+          CXX=$NDK_BIN/i686-linux-android35-clang++ \
+          AR=$NDK_BIN/llvm-ar \
+          RANLIB=$NDK_BIN/llvm-ranlib \
+          STRIP=$NDK_BIN/llvm-strip
 
     - name: Build & Install OpenSSL (Android x86)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      
-      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
+        make distclean
 
     # --- riscv64 ---
     - name: Configure OpenSSL (Android riscv64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      shell: bash
       run: |
-        export CC=riscv64-linux-android35-clang
-        ./Configure android-riscv64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/riscv64 -D__ANDROID_API__=35
+        NDK_BIN=${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin
+        ./Configure linux-generic64 no-shared no-legacy --release \
+          --prefix=${{ github.workspace }}/install/android/riscv64 \
+          CC=$NDK_BIN/riscv64-linux-android35-clang \
+          CXX=$NDK_BIN/riscv64-linux-android35-clang++ \
+          AR=$NDK_BIN/llvm-ar \
+          RANLIB=$NDK_BIN/llvm-ranlib \
+          STRIP=$NDK_BIN/llvm-strip
 
     - name: Build & Install OpenSSL (Android riscv64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      
-      shell: bash
       run: |
         make -j$(nproc)
         make install_sw

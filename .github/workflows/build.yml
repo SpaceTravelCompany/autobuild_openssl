@@ -44,7 +44,7 @@ jobs:
       shell: cmd
       run: |
         set CC=clang-cl
-        perl Configure VC-WIN64A no-shared no-legacy --release /MT --prefix=${{ github.workspace }}/install/windows/x64
+        perl Configure VC-WIN64A no-shared no-legacy --release /MT /Zi --prefix=${{ github.workspace }}/install/windows/x64
 
     - name: Build OpenSSL (Windows x64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
@@ -98,7 +98,7 @@ jobs:
       shell: cmd
       run: |
         set CC=clang-cl
-        perl Configure VC-WIN64-ARM no-shared no-legacy --release /MT --prefix=${{ github.workspace }}/install/windows/arm64
+        perl Configure VC-WIN64-ARM no-shared no-legacy --release /MT /Zi --prefix=${{ github.workspace }}/install/windows/arm64
 
     - name: Build OpenSSL (Windows ARM64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
@@ -167,7 +167,7 @@ jobs:
       run: |
         make -j$(nproc)
         make install_sw
-        make distclean
+        make clean
 
     # --- aarch64 ---
     - name: Configure OpenSSL (Linux aarch64)
@@ -182,7 +182,7 @@ jobs:
       run: |
         make -j$(nproc)
         make install_sw
-        make distclean
+        make clean
 
     # --- riscv64 ---
     - name: Configure OpenSSL (Linux riscv64)
@@ -197,7 +197,7 @@ jobs:
       run: |
         make -j$(nproc)
         make install_sw
-        make distclean
+        make clean
 
     # --- i686 ---
     - name: Configure OpenSSL (Linux i686)
@@ -212,7 +212,7 @@ jobs:
       run: |
         make -j$(nproc)
         make install_sw
-        make distclean
+        make clean
 
     # --- armhf ---
     - name: Configure OpenSSL (Linux armhf)
@@ -274,7 +274,7 @@ jobs:
       run: |
         make -j$(nproc)
         make install_sw
-        make distclean
+        make clean
 
     # --- armeabi-v7a ---
     - name: Configure OpenSSL (Android armeabi-v7a)
@@ -294,7 +294,7 @@ jobs:
       run: |
         make -j$(nproc)
         make install_sw
-        make distclean
+        make clean
 
     # --- x86_64 ---
     - name: Configure OpenSSL (Android x86_64)
@@ -314,7 +314,7 @@ jobs:
       run: |
         make -j$(nproc)
         make install_sw
-        make distclean
+        make clean
 
     # --- x86 ---
     - name: Configure OpenSSL (Android x86)
@@ -334,7 +334,7 @@ jobs:
       run: |
         make -j$(nproc)
         make install_sw
-        make distclean
+        make clean
 
     # --- riscv64 ---
     - name: Configure OpenSSL (Android riscv64)

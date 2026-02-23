@@ -99,7 +99,7 @@ jobs:
       shell: cmd
       run: |
         set CC=clang-cl
-        perl Configure VC-WIN64-ARM no-shared no-legacy --release /MT /Zi --prefix=${{ github.workspace }}/install/windows/arm64
+        perl Configure VC-WIN64-ARM no-shared no-legacy --release /MT --prefix=${{ github.workspace }}/install/windows/arm64
 
     - name: Build OpenSSL (Windows ARM64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}

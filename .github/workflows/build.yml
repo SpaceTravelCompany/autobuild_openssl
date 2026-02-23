@@ -246,7 +246,10 @@ jobs:
       id: setup-ndk
       with:
         ndk-version: r29
-        add-to-path: true
+        add-to-path: false
+
+    - name: Add NDK to PATH
+      run: echo "${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin" >> $GITHUB_PATH
 
     - name: Download OpenSSL source
       run: |

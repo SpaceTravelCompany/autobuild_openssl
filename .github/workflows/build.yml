@@ -157,11 +157,13 @@ jobs:
     # --- x86_64 ---
     - name: Configure OpenSSL (Linux x86_64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         ./Configure linux-x86_64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/x86_64
 
     - name: Build & Install OpenSSL (Linux x86_64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
@@ -170,11 +172,13 @@ jobs:
     # --- aarch64 ---
     - name: Configure OpenSSL (Linux aarch64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         ./Configure linux-aarch64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/aarch64 --cross-compile-prefix=aarch64-linux-gnu-
 
     - name: Build & Install OpenSSL (Linux aarch64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
@@ -183,11 +187,13 @@ jobs:
     # --- riscv64 ---
     - name: Configure OpenSSL (Linux riscv64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         ./Configure linux64-riscv64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/riscv64 --cross-compile-prefix=riscv64-linux-gnu-
 
     - name: Build & Install OpenSSL (Linux riscv64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
@@ -196,11 +202,13 @@ jobs:
     # --- i686 ---
     - name: Configure OpenSSL (Linux i686)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         ./Configure linux-x86 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/i686 --cross-compile-prefix=i686-linux-gnu-
 
     - name: Build & Install OpenSSL (Linux i686)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
@@ -209,11 +217,13 @@ jobs:
     # --- armhf ---
     - name: Configure OpenSSL (Linux armhf)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         ./Configure linux-armv4 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/armhf --cross-compile-prefix=arm-linux-gnueabihf-
 
     - name: Build & Install OpenSSL (Linux armhf)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
+      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
@@ -253,6 +263,7 @@ jobs:
       env:
         ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
         PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      shell: bash
       run: |
         ./Configure android-arm64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/arm64-v8a -D__ANDROID_API__=35
 
@@ -261,6 +272,7 @@ jobs:
       env:
         ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
         PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
@@ -272,6 +284,7 @@ jobs:
       env:
         ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
         PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      shell: bash
       run: |
         ./Configure android-arm no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/armeabi-v7a -D__ANDROID_API__=35
 
@@ -280,6 +293,7 @@ jobs:
       env:
         ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
         PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
@@ -291,6 +305,7 @@ jobs:
       env:
         ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
         PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      shell: bash
       run: |
         ./Configure android-x86_64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/x86_64 -D__ANDROID_API__=35
 
@@ -299,6 +314,7 @@ jobs:
       env:
         ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
         PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
@@ -310,6 +326,7 @@ jobs:
       env:
         ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
         PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      shell: bash
       run: |
         ./Configure android-x86 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/x86 -D__ANDROID_API__=35
 
@@ -318,6 +335,7 @@ jobs:
       env:
         ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
         PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      shell: bash
       run: |
         make -j$(nproc)
         make install_sw
@@ -328,6 +346,7 @@ jobs:
       env:
         ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
         PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      shell: bash
       run: |
         ./Configure android-riscv64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/riscv64 -D__ANDROID_API__=35
 
@@ -336,6 +355,7 @@ jobs:
       env:
         ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
         PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      shell: bash
       run: |
         make -j$(nproc)
         make install_sw

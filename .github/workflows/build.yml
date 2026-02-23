@@ -204,7 +204,7 @@ jobs:
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
       shell: bash
       run: |
-        ./Configure linux-x86 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/i686 CFLAGS="--target=i686-linux-gnu"
+        ./Configure linux-x86-latomic no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/i686 CFLAGS="--target=i686-linux-gnu"
 
     - name: Build & Install OpenSSL (Linux i686)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}

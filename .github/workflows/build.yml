@@ -44,13 +44,14 @@ jobs:
       shell: cmd
       run: |
         set CC=clang-cl
-        perl Configure VC-WIN64A no-shared no-legacy --release /MT /Zi --prefix=${{ github.workspace }}/install/windows/x64
+        perl Configure VC-WIN64A no-shared no-legacy --release /MT --prefix=${{ github.workspace }}/install/windows/x64
 
     - name: Build OpenSSL (Windows x64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
       shell: cmd
       run: |
         nmake
+        type nul > ossl_static.pdb
 
     - name: Install OpenSSL (Windows x64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
@@ -105,6 +106,7 @@ jobs:
       shell: cmd
       run: |
         nmake
+        type nul > ossl_static.pdb
 
     - name: Install OpenSSL (Windows ARM64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}

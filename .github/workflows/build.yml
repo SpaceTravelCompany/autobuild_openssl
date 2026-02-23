@@ -41,20 +41,20 @@ jobs:
 
     - name: Configure OpenSSL (Windows x64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      shell: bash
+      shell: cmd
       run: |
-        export CC=clang-cl
+        set CC=clang-cl
         perl Configure VC-WIN64A no-shared no-legacy --release /MT --prefix=${{ github.workspace }}/install/windows/x64
 
     - name: Build OpenSSL (Windows x64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      shell: bash
+      shell: cmd
       run: |
         nmake
 
     - name: Install OpenSSL (Windows x64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      shell: bash
+      shell: cmd
       run: |
         nmake install_sw
 
@@ -95,20 +95,20 @@ jobs:
 
     - name: Configure OpenSSL (Windows ARM64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      shell: bash
+      shell: cmd
       run: |
         export CC=clang-cl
         perl Configure VC-WIN64-ARM no-shared no-legacy --release /MT --prefix=${{ github.workspace }}/install/windows/arm64
 
     - name: Build OpenSSL (Windows ARM64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      shell: bash
+      shell: cmd
       run: |
         nmake
 
     - name: Install OpenSSL (Windows ARM64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      shell: bash
+      shell: cmd
       run: |
         nmake install_sw
 
@@ -242,7 +242,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
     - uses: nttld/setup-ndk@v1
       id: setup-ndk
       with:
@@ -260,18 +259,12 @@ jobs:
     # --- arm64-v8a ---
     - name: Configure OpenSSL (Android arm64-v8a)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      env:
-        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
-        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
       shell: bash
       run: |
         ./Configure android-arm64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/arm64-v8a -D__ANDROID_API__=35
 
     - name: Build & Install OpenSSL (Android arm64-v8a)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      env:
-        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
-        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
       shell: bash
       run: |
         make -j$(nproc)
@@ -281,18 +274,13 @@ jobs:
     # --- armeabi-v7a ---
     - name: Configure OpenSSL (Android armeabi-v7a)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      env:
-        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
-        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
       shell: bash
       run: |
         ./Configure android-arm no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/armeabi-v7a -D__ANDROID_API__=35
 
     - name: Build & Install OpenSSL (Android armeabi-v7a)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      env:
-        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
-        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      
       shell: bash
       run: |
         make -j$(nproc)
@@ -302,18 +290,13 @@ jobs:
     # --- x86_64 ---
     - name: Configure OpenSSL (Android x86_64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      env:
-        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
-        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
       shell: bash
       run: |
         ./Configure android-x86_64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/x86_64 -D__ANDROID_API__=35
 
     - name: Build & Install OpenSSL (Android x86_64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      env:
-        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
-        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      
       shell: bash
       run: |
         make -j$(nproc)
@@ -323,18 +306,13 @@ jobs:
     # --- x86 ---
     - name: Configure OpenSSL (Android x86)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      env:
-        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
-        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
       shell: bash
       run: |
         ./Configure android-x86 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/x86 -D__ANDROID_API__=35
 
     - name: Build & Install OpenSSL (Android x86)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      env:
-        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
-        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      
       shell: bash
       run: |
         make -j$(nproc)
@@ -343,18 +321,13 @@ jobs:
     # --- riscv64 ---
     - name: Configure OpenSSL (Android riscv64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      env:
-        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
-        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
       shell: bash
       run: |
         ./Configure android-riscv64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/android/riscv64 -D__ANDROID_API__=35
 
     - name: Build & Install OpenSSL (Android riscv64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
-      env:
-        ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
-        PATH: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin:${{ env.PATH }}
+      
       shell: bash
       run: |
         make -j$(nproc)

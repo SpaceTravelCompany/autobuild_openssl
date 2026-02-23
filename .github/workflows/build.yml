@@ -158,8 +158,8 @@ jobs:
     - name: Configure OpenSSL (Linux x86_64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
       shell: bash
-      run: |
-        ./Configure linux-x86_64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/x86_64
+      run: | # 기본적으로 --target 인식 못하는것으로 보임
+        ./Configure linux-x86_64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/x86_64 CFLAGS="--target=x86_64-linux-gnu"
 
     - name: Build & Install OpenSSL (Linux x86_64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
@@ -174,7 +174,7 @@ jobs:
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
       shell: bash
       run: |
-        ./Configure linux-aarch64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/aarch64
+        ./Configure linux-aarch64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/aarch64 CFLAGS="--target=aarch64-linux-gnu"
 
     - name: Build & Install OpenSSL (Linux aarch64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
@@ -189,7 +189,7 @@ jobs:
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
       shell: bash
       run: |
-        ./Configure linux64-riscv64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/riscv64
+        ./Configure linux64-riscv64 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/riscv64 CFLAGS="--target=riscv64-linux-gnu"
 
     - name: Build & Install OpenSSL (Linux riscv64)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
@@ -204,7 +204,7 @@ jobs:
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
       shell: bash
       run: |
-        ./Configure linux-x86 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/i686
+        ./Configure linux-x86 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/i686 CFLAGS="--target=i686-linux-gnu"
 
     - name: Build & Install OpenSSL (Linux i686)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
@@ -219,7 +219,7 @@ jobs:
       working-directory: openssl-${{ env.OPENSSL_VERSION }}
       shell: bash
       run: |
-        ./Configure linux-armv4 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/armhf
+        ./Configure linux-armv4 no-shared no-legacy --release --prefix=${{ github.workspace }}/install/linux/armhf CFLAGS="--target=arm-linux-gnueabihf"
 
     - name: Build & Install OpenSSL (Linux armhf)
       working-directory: openssl-${{ env.OPENSSL_VERSION }}

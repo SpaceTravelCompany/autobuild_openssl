@@ -1,0 +1,28 @@
+name: 'Download OpenSSL'
+description: 'Download and extract OpenSSL source tarball'
+inputs:
+  openssl_version:
+    description: 'OpenSSL version (e.g. directory name suffix)'
+    required: false
+    default: '3.6.1'
+  openssl_url:
+    description: 'URL of the OpenSSL source tarball'
+    required: false
+    default: 'https://github.com/openssl/openssl/releases/download/openssl-3.6.1/openssl-3.6.1.tar.gz'
+outputs:
+  openssl_version:
+    description: 'OpenSSL version used (for working-directory etc.)'
+    value: ${{ steps.version.outputs.openssl_version }}
+runs:
+  using: 'composite'
+  steps:
+    - name: Download OpenSSL source
+      shell: bash
+      run: curl -L -o openssl.tar.gz "${{ inputs.openssl_url }}"
+    - name: Extract OpenSSL source
+      shell: bash
+      run: tar -xzf openssl.tar.gz
+    - name: Set version output
+      id: version
+      shell: bash
+      run: echo "openssl_version=${{ inputs.openssl_version }}" >> "$GITHUB_OUTPUT"

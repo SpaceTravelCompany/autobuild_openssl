@@ -52,7 +52,7 @@ jobs:
         for ver in "${versions[@]}"; do
           cd "openssl-${ver}"
           export CC=clang-cl
-          perl Configure VC-WIN64A no-shared no-legacy --release /MT \
+          perl Configure VC-WIN64A no-shared no-legacy --release //MT \
             --prefix="${GITHUB_WORKSPACE}/install/${ver}/windows/x64"
           nmake
           : > ossl_static.pdb
@@ -108,7 +108,7 @@ jobs:
         for ver in "${versions[@]}"; do
           cd "openssl-${ver}"
           export CC=clang-cl
-          perl Configure VC-WIN64-ARM no-shared no-legacy --release /MT \
+          perl Configure VC-WIN64-ARM no-shared no-legacy --release //MT \
             --prefix="${GITHUB_WORKSPACE}/install/${ver}/windows/arm64"
           nmake
           : > ossl_static.pdb

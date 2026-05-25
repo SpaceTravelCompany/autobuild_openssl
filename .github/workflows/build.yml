@@ -11,7 +11,7 @@ permissions:
 
 env:
   OPENSSL_VERSION_CURRENT: '4.0.0'
-  OPENSSL_VERSION_LTS: '3.5.5'
+  OPENSSL_VERSION_LTS: '3.5.6'
 
 jobs:
   build-libraries-windows:
@@ -45,6 +45,9 @@ jobs:
       shell: bash
       run: |
         set -euo pipefail
+        # Git Bash prepends MSYS perl; OpenSSL VC-* targets need Strawberry Perl.
+        export PATH="/c/Strawberry/perl/bin:/c/Strawberry/c/bin:$PATH"
+        perl -MLocale::Maketext::Simple -e '1' >/dev/null
         versions=("${{ env.OPENSSL_VERSION_CURRENT }}" "${{ env.OPENSSL_VERSION_LTS }}")
         for ver in "${versions[@]}"; do
           cd "openssl-${ver}"
@@ -98,6 +101,9 @@ jobs:
       shell: bash
       run: |
         set -euo pipefail
+        # Git Bash prepends MSYS perl; OpenSSL VC-* targets need Strawberry Perl.
+        export PATH="/c/Strawberry/perl/bin:/c/Strawberry/c/bin:$PATH"
+        perl -MLocale::Maketext::Simple -e '1' >/dev/null
         versions=("${{ env.OPENSSL_VERSION_CURRENT }}" "${{ env.OPENSSL_VERSION_LTS }}")
         for ver in "${versions[@]}"; do
           cd "openssl-${ver}"

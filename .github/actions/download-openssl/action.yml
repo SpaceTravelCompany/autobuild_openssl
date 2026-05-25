@@ -4,11 +4,11 @@ inputs:
   openssl_version:
     description: 'OpenSSL version (e.g. directory name suffix)'
     required: false
-    default: '3.6.1'
+    default: '4.0.0'
   openssl_url:
     description: 'URL of the OpenSSL source tarball'
     required: false
-    default: 'https://github.com/openssl/openssl/releases/download/openssl-3.6.1/openssl-3.6.1.tar.gz'
+    default: 'https://github.com/openssl/openssl/releases/download/openssl-4.0.0/openssl-4.0.0.tar.gz'
 outputs:
   openssl_version:
     description: 'OpenSSL version used (for working-directory etc.)'

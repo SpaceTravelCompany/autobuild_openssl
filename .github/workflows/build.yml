@@ -45,25 +45,30 @@ jobs:
       shell: bash
       run: |
         set -euo pipefail
-        # Git Bash /usr/bin and Strawberry/c/bin ship GNU `link`, which breaks nmake.
+        # Git Bash and Strawberry/c/bin ship GNU `link`; MSYS perl lacks OpenSSL build modules.
         msvc_link="$(command -v link.exe)"
+        perl="/c/Strawberry/perl/bin/perl.exe"
         export LINK="$msvc_link"
+        export PERL="$perl"
         path="$PATH"
         newpath="$(dirname "$msvc_link"):/c/Strawberry/perl/bin"
         IFS=':' read -ra path_parts <<< "$path"
         for dir in "${path_parts[@]}"; do
           case "$dir" in
-            /usr/bin|/c/Strawberry/c/bin|'') continue ;;
+            ''|/usr/bin|/c/Strawberry/c/bin) continue ;;
+          esac
+          case "$dir" in
+            *'/usr/bin') continue ;;
           esac
           newpath="$newpath:$dir"
         done
         export PATH="$newpath"
-        perl -MLocale::Maketext::Simple -e '1' >/dev/null
+        "$perl" -MLocale::Maketext::Simple -e '1' >/dev/null
         versions=("${{ env.OPENSSL_VERSION_CURRENT }}" "${{ env.OPENSSL_VERSION_LTS }}")
         for ver in "${versions[@]}"; do
           cd "openssl-${ver}"
           export CC=clang-cl
-          perl Configure VC-WIN64A no-shared no-legacy no-tests no-apps --release //MT \
+          "$perl" Configure VC-WIN64A no-shared no-legacy no-tests no-apps --release //MT \
             --prefix="${GITHUB_WORKSPACE}/install/${ver}/windows/x64"
           nmake
           : > ossl_static.pdb
@@ -112,25 +117,30 @@ jobs:
       shell: bash
       run: |
         set -euo pipefail
-        # Git Bash /usr/bin and Strawberry/c/bin ship GNU `link`, which breaks nmake.
+        # Git Bash and Strawberry/c/bin ship GNU `link`; MSYS perl lacks OpenSSL build modules.
         msvc_link="$(command -v link.exe)"
+        perl="/c/Strawberry/perl/bin/perl.exe"
         export LINK="$msvc_link"
+        export PERL="$perl"
         path="$PATH"
         newpath="$(dirname "$msvc_link"):/c/Strawberry/perl/bin"
         IFS=':' read -ra path_parts <<< "$path"
         for dir in "${path_parts[@]}"; do
           case "$dir" in
-            /usr/bin|/c/Strawberry/c/bin|'') continue ;;
+            ''|/usr/bin|/c/Strawberry/c/bin) continue ;;
+          esac
+          case "$dir" in
+            *'/usr/bin') continue ;;
           esac
           newpath="$newpath:$dir"
         done
         export PATH="$newpath"
-        perl -MLocale::Maketext::Simple -e '1' >/dev/null
+        "$perl" -MLocale::Maketext::Simple -e '1' >/dev/null
         versions=("${{ env.OPENSSL_VERSION_CURRENT }}" "${{ env.OPENSSL_VERSION_LTS }}")
         for ver in "${versions[@]}"; do
           cd "openssl-${ver}"
           export CC=clang-cl
-          perl Configure VC-WIN64-ARM no-shared no-legacy no-tests no-apps --release //MT \
+          "$perl" Configure VC-WIN64-ARM no-shared no-legacy no-tests no-apps --release //MT \
             --prefix="${GITHUB_WORKSPACE}/install/${ver}/windows/arm64"
           nmake
           : > ossl_static.pdb

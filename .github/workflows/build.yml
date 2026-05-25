@@ -46,13 +46,14 @@ jobs:
       run: |
         set -euo pipefail
         # Git Bash prepends MSYS perl; OpenSSL VC-* targets need Strawberry Perl.
-        export PATH="/c/Strawberry/perl/bin:/c/Strawberry/c/bin:$PATH"
+        # Do not prepend Strawberry/c/bin: its GNU `link` shadows MSVC link.exe.
+        export PATH="/c/Strawberry/perl/bin:$PATH"
         perl -MLocale::Maketext::Simple -e '1' >/dev/null
         versions=("${{ env.OPENSSL_VERSION_CURRENT }}" "${{ env.OPENSSL_VERSION_LTS }}")
         for ver in "${versions[@]}"; do
           cd "openssl-${ver}"
           export CC=clang-cl
-          perl Configure VC-WIN64A no-shared no-legacy --release //MT \
+          perl Configure VC-WIN64A no-shared no-legacy no-tests --release //MT \
             --prefix="${GITHUB_WORKSPACE}/install/${ver}/windows/x64"
           nmake
           : > ossl_static.pdb
@@ -102,13 +103,14 @@ jobs:
       run: |
         set -euo pipefail
         # Git Bash prepends MSYS perl; OpenSSL VC-* targets need Strawberry Perl.
-        export PATH="/c/Strawberry/perl/bin:/c/Strawberry/c/bin:$PATH"
+        # Do not prepend Strawberry/c/bin: its GNU `link` shadows MSVC link.exe.
+        export PATH="/c/Strawberry/perl/bin:$PATH"
         perl -MLocale::Maketext::Simple -e '1' >/dev/null
         versions=("${{ env.OPENSSL_VERSION_CURRENT }}" "${{ env.OPENSSL_VERSION_LTS }}")
         for ver in "${versions[@]}"; do
           cd "openssl-${ver}"
           export CC=clang-cl
-          perl Configure VC-WIN64-ARM no-shared no-legacy --release //MT \
+          perl Configure VC-WIN64-ARM no-shared no-legacy no-tests --release //MT \
             --prefix="${GITHUB_WORKSPACE}/install/${ver}/windows/arm64"
           nmake
           : > ossl_static.pdb

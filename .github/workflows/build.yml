@@ -331,11 +331,26 @@ jobs:
 
     - name: Prepare release directory
       run: |
+        set -euo pipefail
         mkdir -p release
-        cp -r artifacts/libraries-compiled-linux/install/* release/
-        cp -r artifacts/libraries-compiled-android/install/* release/
-        cp -r artifacts/libraries-windows/install/* release/
-        cp -r artifacts/libraries-windows-arm64/install/* release/
+        shopt -s nullglob
+        for artifact in \
+          libraries-compiled-linux \
+          libraries-compiled-android \
+          libraries-windows \
+          libraries-windows-arm64
+        do
+          src="artifacts/${artifact}"
+          if [ -d "${src}/install" ]; then
+            cp -r "${src}/install/"* release/
+          elif [ -d "${src}" ] && [ -n "$(ls -A "${src}")" ]; then
+            # upload-artifact v4 with path install/** drops the install/ prefix
+            cp -r "${src}/"* release/
+          else
+            echo "Artifact not found or empty: ${artifact}" >&2
+            exit 1
+          fi
+        done
 
     - name: Create tar archive
       working-directory: release
